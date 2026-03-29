@@ -1,0 +1,13 @@
+{
+  "blast": {
+    "error": "not installed"
+  },
+  "knn": {
+    "species_accuracy_test": 0.9001721170395869,
+    "genus_accuracy_unseen": 0.0,
+    "seqs_per_sec": 3958.890664359473
+  },
+  "random_forest": {
+    "species_accuracy_test": 0.906073272682567
+  }
+}
