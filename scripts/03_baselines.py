@@ -42,15 +42,19 @@ def extract_kmer_features(sequences, k=6):
 def run_blast(train_df, test_df, label_col="species_name"):
     """BLASTn baseline: build DB from train, query with test."""
     with tempfile.TemporaryDirectory() as tmpdir:
+        # Build reference DB with species labels encoded in headers
         db_fasta = f"{tmpdir}/db.fasta"
         with open(db_fasta, "w") as f:
-            for idx, row in train_df.iterrows():
-                f.write(f">{idx}|{row[label_col]}\n{row['nucleotides']}\n")
+            for i, (idx, row) in enumerate(train_df.iterrows()):
+                f.write(f">ref_{i}___{row[label_col].replace(' ', '_')}\n{row['nucleotides']}\n")
 
+        # Write query sequences with sequential IDs
         query_fasta = f"{tmpdir}/query.fasta"
+        query_labels = []
         with open(query_fasta, "w") as f:
-            for idx, row in test_df.iterrows():
-                f.write(f">{idx}\n{row['nucleotides']}\n")
+            for i, (idx, row) in enumerate(test_df.iterrows()):
+                f.write(f">query_{i}\n{row['nucleotides']}\n")
+                query_labels.append(row[label_col])
 
         subprocess.run(
             ["makeblastdb", "-in", db_fasta, "-dbtype", "nucl", "-out", f"{tmpdir}/blastdb"],
@@ -66,21 +70,24 @@ def run_blast(train_df, test_df, label_col="species_name"):
         )
         elapsed = time.time() - start
 
+        # Parse: extract species from subject ID (ref_N___Genus_species)
         predictions = {}
         for line in result.stdout.strip().split("\n"):
             if not line:
                 continue
             parts = line.split("\t")
-            qid = int(parts[0])
-            label = parts[1].split("|", 1)[1] if "|" in parts[1] else "Unknown"
+            qid = parts[0]  # e.g. "query_0"
+            sid = parts[1]  # e.g. "ref_5___Amphiprion_ocellaris"
+            label = sid.split("___", 1)[1].replace("_", " ") if "___" in sid else "Unknown"
             if qid not in predictions:
                 predictions[qid] = label
 
         y_true, y_pred, no_hit = [], [], 0
-        for idx, row in test_df.iterrows():
-            y_true.append(row[label_col])
-            if idx in predictions:
-                y_pred.append(predictions[idx])
+        for i, true_label in enumerate(query_labels):
+            qid = f"query_{i}"
+            y_true.append(true_label)
+            if qid in predictions:
+                y_pred.append(predictions[qid])
             else:
                 y_pred.append("NO_HIT")
                 no_hit += 1
