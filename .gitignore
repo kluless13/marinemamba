@@ -1,0 +1,46 @@
+# Data (too large for git)
+data/raw/
+data/processed/
+*.fasta
+*.fa
+*.tsv
+*.csv
+!data/README.md
+
+# Model checkpoints
+checkpoints/
+*.pt
+*.ckpt
+*.bin
+*.safetensors
+
+# Results (regenerable)
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+*.env
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Wandb
+wandb/
