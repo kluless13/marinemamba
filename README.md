@@ -38,14 +38,14 @@ We compare this against training from scratch, direct transfer, and traditional 
 
 ```bash
 # Clone
-git clone https://github.com/kluless/marinemamba.git
+git clone https://github.com/kluless13/marinemamba.git
 cd marinemamba
 
 # Install
 pip install -r requirements.txt
 
 # Or open notebooks in Colab
-# https://colab.research.google.com/github/kluless/marinemamba/blob/main/notebooks/01_data_acquisition.ipynb
+# https://colab.research.google.com/github/kluless13/marinemamba/blob/main/notebooks/01_data_acquisition.ipynb
 ```
 
 ## Architecture
