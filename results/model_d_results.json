@@ -1,0 +1,11 @@
+{
+  "mode": "scratch",
+  "model_name": "model_d",
+  "finetune_test": {
+    "test/loss": 0.685962438583374,
+    "test/acc": 0.8662405014038086
+  },
+  "linear_probe_accuracy": 0.8672239980329481,
+  "genus_accuracy_unseen": 0.008059100067159167,
+  "genus_balanced_accuracy_unseen": 0.005733638305634334
+}

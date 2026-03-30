@@ -1,0 +1,11 @@
+{
+  "mode": "transfer",
+  "model_name": "model_c",
+  "finetune_test": {
+    "test/loss": 6.144589424133301,
+    "test/acc": 0.052372757345438004
+  },
+  "linear_probe_accuracy": 0.03245635603639046,
+  "genus_accuracy_unseen": 0.0,
+  "genus_balanced_accuracy_unseen": 0.0
+}

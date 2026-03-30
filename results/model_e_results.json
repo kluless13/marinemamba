@@ -1,0 +1,11 @@
+{
+  "mode": "adapt",
+  "model_name": "model_e",
+  "finetune_test": {
+    "test/loss": 0.9102804660797119,
+    "test/acc": 0.8133759498596191
+  },
+  "linear_probe_accuracy": 0.8384558642734202,
+  "genus_accuracy_unseen": 0.0047011417058428475,
+  "genus_balanced_accuracy_unseen": 0.0023171135385633896
+}
