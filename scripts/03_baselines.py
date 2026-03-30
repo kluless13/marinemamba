@@ -41,7 +41,7 @@ def extract_kmer_features(sequences, k=6):
     all_kmers = ["".join(p) for p in product("ACGT", repeat=k)]
     kmer_to_idx = {km: i for i, km in enumerate(all_kmers)}
 
-    n_workers = min(mp.cpu_count(), 16)
+    n_workers = mp.cpu_count() or 4
     args = [(seq, kmer_to_idx, k) for seq in sequences]
 
     print(f"  Extracting {k}-mers using {n_workers} workers...")
@@ -69,7 +69,7 @@ def run_blast(train_df, test_df, label_col="species_name", batch_size=5000):
         )
         print("  Database built.")
 
-        n_threads = str(min(os.cpu_count() or 4, 16))
+        n_threads = str(os.cpu_count() or 4)
         query_labels = test_df[label_col].tolist()
         predictions = {}
         n_batches = (len(test_df) + batch_size - 1) // batch_size
