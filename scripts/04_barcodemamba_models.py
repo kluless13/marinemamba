@@ -23,7 +23,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import lightning as pl
+import pytorch_lightning as pl
 from torch.utils.data import DataLoader, Dataset
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
