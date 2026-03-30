@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import json
+import os
 import subprocess
 import tempfile
 import time
@@ -18,25 +19,38 @@ RESULTS_DIR = Path(__file__).parent.parent / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _kmer_single(args):
+    """Extract k-mer frequencies for a single sequence."""
+    seq, kmer_to_idx, k = args
+    counts = np.zeros(len(kmer_to_idx), dtype=np.float32)
+    for j in range(len(seq) - k + 1):
+        kmer = seq[j : j + k]
+        idx = kmer_to_idx.get(kmer)
+        if idx is not None:
+            counts[idx] += 1
+    total = counts.sum()
+    if total > 0:
+        counts /= total
+    return counts
+
+
 def extract_kmer_features(sequences, k=6):
-    """Extract k-mer frequency vectors from DNA sequences."""
+    """Extract k-mer frequency vectors from DNA sequences (parallelized)."""
+    import multiprocessing as mp
+
     all_kmers = ["".join(p) for p in product("ACGT", repeat=k)]
     kmer_to_idx = {km: i for i, km in enumerate(all_kmers)}
 
-    features = np.zeros((len(sequences), len(all_kmers)), dtype=np.float32)
+    n_workers = min(mp.cpu_count(), 16)
+    args = [(seq, kmer_to_idx, k) for seq in sequences]
 
-    for i, seq in enumerate(tqdm(sequences, desc=f"Extracting {k}-mers")):
-        counts = Counter()
-        for j in range(len(seq) - k + 1):
-            kmer = seq[j : j + k]
-            if kmer in kmer_to_idx:
-                counts[kmer] += 1
-        total = sum(counts.values())
-        if total > 0:
-            for kmer, count in counts.items():
-                features[i, kmer_to_idx[kmer]] = count / total
+    print(f"  Extracting {k}-mers using {n_workers} workers...")
+    with mp.Pool(n_workers) as pool:
+        results = list(tqdm(pool.imap(
+            _kmer_single, args, chunksize=500
+        ), total=len(sequences), desc=f"Extracting {k}-mers"))
 
-    return features
+    return np.stack(results)
 
 
 def run_blast(train_df, test_df, label_col="species_name"):
@@ -65,7 +79,7 @@ def run_blast(train_df, test_df, label_col="species_name"):
         result = subprocess.run(
             ["blastn", "-query", query_fasta, "-db", f"{tmpdir}/blastdb",
              "-outfmt", "6 qseqid sseqid pident evalue", "-max_target_seqs", "1",
-             "-evalue", "1e-5", "-num_threads", "4"],
+             "-evalue", "1e-5", "-num_threads", str(min(os.cpu_count() or 4, 16))],
             capture_output=True, text=True, check=True,
         )
         elapsed = time.time() - start
