@@ -30,7 +30,7 @@ git clone https://github.com/kluless13/marinemamba.git 2>/dev/null || (cd marine
 cd /workspace/marinemamba
 
 # Verify everything
-python -c "
+python3 -c "
 import torch
 print(f'GPU: {torch.cuda.get_device_name(0)}')
 print(f'VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.0f} GB')

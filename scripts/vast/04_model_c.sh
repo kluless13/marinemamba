@@ -6,7 +6,7 @@ echo "============================================================"
 echo "STEP 4: MODEL C — BARCODEMAMBA TRANSFER (insect → fish)"
 echo "============================================================"
 
-python scripts/04_barcodemamba_models.py --mode transfer --data-dir data/processed --output-dir results
+python3 scripts/04_barcodemamba_models.py --mode transfer --data-dir data/processed --output-dir results
 
 echo ""
 echo "============================================================"

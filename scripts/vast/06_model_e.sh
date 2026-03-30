@@ -6,7 +6,7 @@ echo "============================================================"
 echo "STEP 6: MODEL E — BARCODEMAMBA DOMAIN ADAPTATION"
 echo "============================================================"
 
-python scripts/04_barcodemamba_models.py --mode adapt --data-dir data/processed --output-dir results
+python3 scripts/04_barcodemamba_models.py --mode adapt --data-dir data/processed --output-dir results
 
 echo ""
 echo "============================================================"

@@ -15,37 +15,43 @@ Three-stage domain-adaptive pretraining:
 
 We compare this against training from scratch, direct transfer, and traditional baselines (BLAST, k-NN).
 
-## Data Sources
+## Data
 
-- [Mare-MAGE](http://mare-mage.weebly.com/) — 231K curated fish barcode sequences (COI + 12S)
-- [BOLD Systems](https://boldsystems.org) — 327K+ fish specimens with COI barcodes
-- [meta-fish-lib](https://github.com/genner-lab/meta-fish-lib) — curated fish metabarcoding reference library
-- [NCBI GenBank](https://www.ncbi.nlm.nih.gov/nuccore) — gap-filling
+**360,757 COI barcode sequences** from [BOLD Systems v5 API](https://portal.boldsystems.org/api) (Barcode of Life Data), covering **25,663 species** across **4,145 genera** of ray-finned fishes (Teleostei).
 
-## Notebooks
+After quality filtering (500-700bp, ≤5% ambiguous bases, species-level ID required):
 
-| Notebook | Description |
-|---|---|
-| `01_data_acquisition.ipynb` | Download and merge marine fish barcode data |
-| `02_data_cleaning.ipynb` | QC, taxonomy validation, train/test splits |
-| `03_baselines.ipynb` | BLAST, k-NN, Random Forest baselines |
-| `04_pretrain.ipynb` | Domain-adaptive pretraining on fish barcodes |
-| `05_finetune.ipynb` | Fine-tune and evaluate all models |
-| `06_analysis.ipynb` | Figures, comparison tables, failure analysis |
-| `07_release.ipynb` | Package model for HuggingFace + Zenodo |
+| Split | Sequences | Species | Genera |
+|---|---|---|---|
+| Total | 318,829 | 23,663 | 4,017 |
+| Train | 194,457 | 10,242 | — |
+| Validation | 27,780 | 10,242 | — |
+| Test | 55,560 | 10,242 | — |
+| Unseen genera | 19,399 | — | 173 |
+
+Unseen genera are held out entirely — no species from these genera appear in training. This tests whether models learn transferable taxonomic representations rather than memorizing species-specific patterns.
+
+## Models
+
+| Model | Method | Description |
+|---|---|---|
+| A | BLAST | BLASTn top-1 hit against training database |
+| B | k-NN + 6-mer | 1-NN cosine similarity on 6-mer frequency vectors |
+| C | BarcodeMamba (transfer) | Insect-pretrained SSM, fine-tuned on fish |
+| D | BarcodeMamba (scratch) | SSM pretrained from scratch on fish COI, then fine-tuned |
+| E | BarcodeMamba (adapted) | Insect SSM, continued pretraining on fish, then fine-tuned |
+| F | Evo 2 (7B) | Embeddings from Arc Institute's genomic foundation model + linear classifier |
 
 ## Quick Start
 
 ```bash
-# Clone
-git clone https://github.com/kluless13/marinemamba.git
-cd marinemamba
+# Run everything on Vast.ai A100 (recommended)
+pip install vastai-sdk
+export VAST_API_KEY="your-key"
+# Then run scripts/vast/01_setup.sh through 09_save_results.sh
 
-# Install
-pip install -r requirements.txt
-
-# Or open notebooks in Colab
-# https://colab.research.google.com/github/kluless13/marinemamba/blob/main/notebooks/01_data_acquisition.ipynb
+# Or open in Colab
+# https://colab.research.google.com/github/kluless13/marinemamba/blob/main/notebooks/gpu_runner.ipynb
 ```
 
 ## Architecture

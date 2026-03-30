@@ -6,7 +6,7 @@ echo "============================================================"
 echo "STEP 2: FETCH & PROCESS BOLD DATA"
 echo "============================================================"
 
-python -c "
+python3 -c "
 import requests, csv, sys, os
 from pathlib import Path
 from collections import Counter
@@ -72,7 +72,7 @@ for reason, count in skipped.most_common():
 
 echo ""
 echo "Running train/test/unseen splits..."
-python scripts/02_clean_and_split.py
+python3 scripts/02_clean_and_split.py
 
 echo ""
 echo "============================================================"

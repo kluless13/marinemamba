@@ -8,7 +8,7 @@ echo "============================================================"
 echo "This is the longest run (pretrain + finetune)."
 echo ""
 
-python scripts/04_barcodemamba_models.py --mode scratch --data-dir data/processed --output-dir results
+python3 scripts/04_barcodemamba_models.py --mode scratch --data-dir data/processed --output-dir results
 
 echo ""
 echo "============================================================"

@@ -5,7 +5,7 @@ echo "============================================================"
 echo "MARINEMAMBA EXPERIMENT RESULTS"
 echo "============================================================"
 
-python -c "
+python3 -c "
 import json, glob
 
 with open('data/processed/dataset_stats.json') as f:

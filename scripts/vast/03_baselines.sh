@@ -6,7 +6,7 @@ echo "============================================================"
 echo "STEP 3: MODELS A & B — BASELINES (BLAST + k-NN)"
 echo "============================================================"
 
-python scripts/03_baselines.py
+python3 scripts/03_baselines.py
 
 echo ""
 echo "============================================================"
