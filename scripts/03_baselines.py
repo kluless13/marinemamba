@@ -53,48 +53,57 @@ def extract_kmer_features(sequences, k=6):
     return np.stack(results)
 
 
-def run_blast(train_df, test_df, label_col="species_name"):
-    """BLASTn baseline: build DB from train, query with test."""
+def run_blast(train_df, test_df, label_col="species_name", batch_size=5000):
+    """BLASTn baseline: build DB from train, query test in batches with progress."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Build reference DB with species labels encoded in headers
+        # Build reference DB
+        print("  Building BLAST database...")
         db_fasta = f"{tmpdir}/db.fasta"
         with open(db_fasta, "w") as f:
             for i, (idx, row) in enumerate(train_df.iterrows()):
                 f.write(f">ref_{i}___{row[label_col].replace(' ', '_')}\n{row['nucleotides']}\n")
 
-        # Write query sequences with sequential IDs
-        query_fasta = f"{tmpdir}/query.fasta"
-        query_labels = []
-        with open(query_fasta, "w") as f:
-            for i, (idx, row) in enumerate(test_df.iterrows()):
-                f.write(f">query_{i}\n{row['nucleotides']}\n")
-                query_labels.append(row[label_col])
-
         subprocess.run(
             ["makeblastdb", "-in", db_fasta, "-dbtype", "nucl", "-out", f"{tmpdir}/blastdb"],
             capture_output=True, check=True,
         )
+        print("  Database built.")
+
+        n_threads = str(min(os.cpu_count() or 4, 16))
+        query_labels = test_df[label_col].tolist()
+        predictions = {}
+        n_batches = (len(test_df) + batch_size - 1) // batch_size
 
         start = time.time()
-        result = subprocess.run(
-            ["blastn", "-query", query_fasta, "-db", f"{tmpdir}/blastdb",
-             "-outfmt", "6 qseqid sseqid pident evalue", "-max_target_seqs", "1",
-             "-evalue", "1e-5", "-num_threads", str(min(os.cpu_count() or 4, 16))],
-            capture_output=True, text=True, check=True,
-        )
-        elapsed = time.time() - start
+        for batch_idx in tqdm(range(n_batches), desc="  BLAST batches"):
+            batch_start = batch_idx * batch_size
+            batch_end = min(batch_start + batch_size, len(test_df))
+            batch_df = test_df.iloc[batch_start:batch_end]
 
-        # Parse: extract species from subject ID (ref_N___Genus_species)
-        predictions = {}
-        for line in result.stdout.strip().split("\n"):
-            if not line:
-                continue
-            parts = line.split("\t")
-            qid = parts[0]  # e.g. "query_0"
-            sid = parts[1]  # e.g. "ref_5___Amphiprion_ocellaris"
-            label = sid.split("___", 1)[1].replace("_", " ") if "___" in sid else "Unknown"
-            if qid not in predictions:
-                predictions[qid] = label
+            query_fasta = f"{tmpdir}/query_batch.fasta"
+            with open(query_fasta, "w") as f:
+                for i, (idx, row) in enumerate(batch_df.iterrows()):
+                    global_i = batch_start + i
+                    f.write(f">query_{global_i}\n{row['nucleotides']}\n")
+
+            result = subprocess.run(
+                ["blastn", "-query", query_fasta, "-db", f"{tmpdir}/blastdb",
+                 "-outfmt", "6 qseqid sseqid pident evalue", "-max_target_seqs", "1",
+                 "-evalue", "1e-5", "-num_threads", n_threads],
+                capture_output=True, text=True, check=True,
+            )
+
+            for line in result.stdout.strip().split("\n"):
+                if not line:
+                    continue
+                parts = line.split("\t")
+                qid = parts[0]
+                sid = parts[1]
+                label = sid.split("___", 1)[1].replace("_", " ") if "___" in sid else "Unknown"
+                if qid not in predictions:
+                    predictions[qid] = label
+
+        elapsed = time.time() - start
 
         y_true, y_pred, no_hit = [], [], 0
         for i, true_label in enumerate(query_labels):
