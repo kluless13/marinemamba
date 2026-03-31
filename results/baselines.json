@@ -1,15 +1,15 @@
 {
+  "dataset": "BOLD_318K",
   "blast": {
-    "accuracy": 0.7351856405212688,
+    "accuracy": 0.9022,
     "no_hit_rate": 0.0,
-    "seqs_per_sec": 104.08489823317916
+    "seqs_per_sec": 14.4
   },
   "knn": {
-    "species_accuracy_test": 0.9001721170395869,
-    "genus_accuracy_unseen": 0.0,
-    "seqs_per_sec": 3833.8056117800365
+    "species_accuracy_test": 0.9301,
+    "genus_accuracy_unseen": 0.0
   },
   "random_forest": {
-    "species_accuracy_test": 0.906073272682567
+    "note": "killed_OOM_on_instance"
   }
 }

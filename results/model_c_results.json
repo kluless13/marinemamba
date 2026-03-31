@@ -1,11 +1,12 @@
 {
+  "dataset": "BOLD_318K",
   "mode": "transfer",
   "model_name": "model_c",
   "finetune_test": {
-    "test/loss": 6.144589424133301,
-    "test/acc": 0.052372757345438004
+    "test/loss": 0.6926758289337158,
+    "test/acc": 0.8716522455215454
   },
-  "linear_probe_accuracy": 0.03245635603639046,
-  "genus_accuracy_unseen": 0.0,
-  "genus_balanced_accuracy_unseen": 0.0
+  "linear_probe_accuracy": 0.9169546436285098,
+  "genus_accuracy_unseen": 0.0002061961956801897,
+  "genus_balanced_accuracy_unseen": 4.613977048266502e-05
 }
