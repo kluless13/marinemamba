@@ -1,0 +1,27 @@
+{
+  "knn_genus": {
+    "accuracy": 0.0,
+    "n_evaluated": 19399,
+    "n_correct": 0
+  },
+  "knn_family": {
+    "accuracy": 0.5600804165163152,
+    "n_evaluated": 19399,
+    "n_correct": 10865
+  },
+  "knn_order": {
+    "accuracy": 0.653229547914841,
+    "n_evaluated": 19399,
+    "n_correct": 12672
+  },
+  "nn_family_match": {
+    "accuracy": 0.5600804165163152,
+    "n_correct": 10865,
+    "n_evaluated": 19399
+  },
+  "nn_order_match": {
+    "accuracy": 0.653229547914841,
+    "n_correct": 12672,
+    "n_evaluated": 19399
+  }
+}
