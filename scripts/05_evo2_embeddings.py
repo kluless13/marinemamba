@@ -22,6 +22,27 @@ if "transformer_engine" not in sys.modules:
     sys.modules["transformer_engine.pytorch"] = te.pytorch
     sys.modules["transformer_engine.common"] = te.common
 
+# Patch vortex to skip FP8 check and force use_fp8_input_projections=False
+try:
+    import importlib, pathlib
+    vortex_model_path = None
+    for p in sys.path:
+        candidate = pathlib.Path(p) / "vortex" / "model" / "model.py"
+        if candidate.exists():
+            vortex_model_path = candidate
+            break
+    if vortex_model_path:
+        source = vortex_model_path.read_text()
+        if 'if config.get("use_fp8_input_projections", False) and not HAS_TE:' in source:
+            patched = source.replace(
+                'if config.get("use_fp8_input_projections", False) and not HAS_TE:',
+                'if False:  # patched by marinemamba'
+            )
+            vortex_model_path.write_text(patched)
+            print("Patched vortex to skip FP8 check.")
+except Exception as e:
+    print(f"Vortex patch skipped: {e}")
+
 import numpy as np
 import pandas as pd
 import torch
