@@ -1,0 +1,18 @@
+{
+  "dataset": "BOLD_318K",
+  "model_c": {
+    "genus": {"accuracy": 0.0, "n_correct": 0, "n_total": 19399},
+    "family": {"accuracy": 0.3745, "n_correct": 7265, "n_total": 19399},
+    "order": {"accuracy": 0.4462, "n_correct": 8655, "n_total": 19399}
+  },
+  "model_d": {
+    "genus": {"accuracy": 0.0, "n_correct": 0, "n_total": 19399},
+    "family": {"accuracy": 0.4697, "n_correct": 9112, "n_total": 19399},
+    "order": {"accuracy": 0.5718, "n_correct": 11092, "n_total": 19399}
+  },
+  "model_e": {
+    "genus": {"accuracy": 0.0, "n_correct": 0, "n_total": 19399},
+    "family": {"accuracy": 0.4844, "n_correct": 9396, "n_total": 19399},
+    "order": {"accuracy": 0.5772, "n_correct": 11197, "n_total": 19399}
+  }
+}

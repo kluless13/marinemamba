@@ -1,0 +1,23 @@
+{
+  "dataset": "BOLD_318K",
+  "model": "evo2_7b",
+  "classifier": "1nn_cosine",
+  "species_knn": {
+    "accuracy": 0.8471382289416847
+  },
+  "genus_knn_unseen": {
+    "accuracy": 0.0
+  },
+  "hierarchical_unseen": {
+    "family": {
+      "accuracy": 0.3843,
+      "n_correct": 7455,
+      "n_total": 19399
+    },
+    "order": {
+      "accuracy": 0.4865,
+      "n_correct": 9438,
+      "n_total": 19399
+    }
+  }
+}
