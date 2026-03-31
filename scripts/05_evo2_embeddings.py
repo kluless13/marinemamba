@@ -8,7 +8,19 @@ Usage (run in Colab with A100):
 import argparse
 import json
 import os
+import sys
 import time
+import types
+
+# Patch transformer_engine to avoid cuDNN dependency
+if "transformer_engine" not in sys.modules:
+    te = types.ModuleType("transformer_engine")
+    te.pytorch = types.ModuleType("transformer_engine.pytorch")
+    te.common = types.ModuleType("transformer_engine.common")
+    te.pytorch.Linear = type("L", (), {})
+    sys.modules["transformer_engine"] = te
+    sys.modules["transformer_engine.pytorch"] = te.pytorch
+    sys.modules["transformer_engine.common"] = te.common
 
 import numpy as np
 import pandas as pd
