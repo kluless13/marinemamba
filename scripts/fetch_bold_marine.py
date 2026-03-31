@@ -31,13 +31,26 @@ RAW_DIR = Path(__file__).parent.parent / "data" / "raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 MARINE_TAXA = [
+    # Core taxa (~1.15M)
     {"name": "Teleostei", "query": "tax:class:Teleostei", "phylum": "Chordata", "expected": 420000},
     {"name": "Mollusca", "query": "tax:phylum:Mollusca", "phylum": "Mollusca", "expected": 312000},
     {"name": "Malacostraca", "query": "tax:class:Malacostraca", "phylum": "Arthropoda", "expected": 233000},
-    {"name": "Polychaeta", "query": "tax:class:Polychaeta", "phylum": "Annelida", "expected": 55000},
     {"name": "Echinodermata", "query": "tax:phylum:Echinodermata", "phylum": "Echinodermata", "expected": 49000},
     {"name": "Cnidaria", "query": "tax:phylum:Cnidaria", "phylum": "Cnidaria", "expected": 44000},
     {"name": "Elasmobranchii", "query": "tax:class:Elasmobranchii", "phylum": "Chordata", "expected": 29000},
+    {"name": "Porifera", "query": "tax:phylum:Porifera", "phylum": "Porifera", "expected": 13000},
+    # Additional taxa to reach ~1.3M+ (use Annelida instead of Polychaeta to get all worms)
+    {"name": "Annelida", "query": "tax:phylum:Annelida", "phylum": "Annelida", "expected": 80000},
+    {"name": "Nematoda", "query": "tax:phylum:Nematoda", "phylum": "Nematoda", "expected": 30000},
+    {"name": "Branchiopoda", "query": "tax:class:Branchiopoda", "phylum": "Arthropoda", "expected": 22000},
+    {"name": "Platyhelminthes", "query": "tax:phylum:Platyhelminthes", "phylum": "Platyhelminthes", "expected": 15000},
+    {"name": "Bryozoa", "query": "tax:phylum:Bryozoa", "phylum": "Bryozoa", "expected": 8000},
+    {"name": "Ascidiacea", "query": "tax:class:Ascidiacea", "phylum": "Chordata", "expected": 6000},
+    {"name": "Nemertea", "query": "tax:phylum:Nemertea", "phylum": "Nemertea", "expected": 5000},
+    {"name": "Testudines", "query": "tax:order:Testudines", "phylum": "Chordata", "expected": 5000},
+    {"name": "Chaetognatha", "query": "tax:phylum:Chaetognatha", "phylum": "Chaetognatha", "expected": 2000},
+    {"name": "Ctenophora", "query": "tax:phylum:Ctenophora", "phylum": "Ctenophora", "expected": 748},
+    {"name": "Brachiopoda", "query": "tax:phylum:Brachiopoda", "phylum": "Brachiopoda", "expected": 635},
     {"name": "Porifera", "query": "tax:phylum:Porifera", "phylum": "Porifera", "expected": 13000},
 ]
 
