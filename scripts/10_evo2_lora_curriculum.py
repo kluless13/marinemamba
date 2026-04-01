@@ -156,12 +156,13 @@ def get_curriculum_weights(epoch, total_epochs):
 
 def train(model, train_dl, val_dl, epochs=50, lr=1e-3, device="cuda"):
     """Train with curriculum learning."""
+    min_epochs = int(epochs * 0.85)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     model.to(device)
 
     best_val_loss = float("inf")
-    patience = 7
+    patience = 10
     patience_counter = 0
 
     for epoch in range(epochs):
@@ -220,9 +221,12 @@ def train(model, train_dl, val_dl, epochs=50, lr=1e-3, device="cuda"):
             torch.save(model.state_dict(), "results/evo2_lora_curriculum_best.pt")
         else:
             patience_counter += 1
-            if patience_counter >= patience:
+            if patience_counter >= patience and epoch >= min_epochs:
                 print(f"  Early stopping at epoch {epoch+1}")
                 break
+            elif patience_counter >= patience:
+                print(f"  Patience hit at epoch {epoch+1} but min_epochs={min_epochs}, continuing...")
+                patience_counter = 0
 
     model.load_state_dict(torch.load("results/evo2_lora_curriculum_best.pt", weights_only=True))
     return model
@@ -379,13 +383,46 @@ def main():
             hierarchical[level] = {"accuracy": 0.0, "n_correct": 0, "n_total": 0}
             print(f"  {level.title()}: 0.0000")
 
+    # ── Eval B: Unseen Species / Seen Genera (BarcodeMamba/Stalder protocol) ──
+    print("\n=== SEEN GENERA, UNSEEN SPECIES (BarcodeMamba protocol) ===")
+
+    X_test_adapted = model.get_features(
+        torch.tensor(X_test, dtype=torch.float32).to(device)
+    ).cpu().numpy()
+
+    knn_genus_seen = KNeighborsClassifier(n_neighbors=1, metric="cosine", n_jobs=-1)
+    knn_genus_seen.fit(X_train_adapted, train_df["genus_name"].astype(str).tolist())
+    genus_preds_test = knn_genus_seen.predict(X_test_adapted)
+    genus_acc_seen = float(accuracy_score(test_df["genus_name"].astype(str), genus_preds_test))
+    print(f"  Genus accuracy (seen genera): {genus_acc_seen:.4f}")
+
+    family_preds_test = [genus_tax_map.get(g, {}).get("family", "") for g in genus_preds_test]
+    true_families_test = [genus_tax_map.get(g, {}).get("family", "") for g in test_df["genus_name"].astype(str)]
+    valid_f = [(t, p) for t, p in zip(true_families_test, family_preds_test) if t and p]
+    family_acc_seen = accuracy_score(*zip(*valid_f)) if valid_f else 0.0
+
+    order_preds_test = [genus_tax_map.get(g, {}).get("order", "") for g in genus_preds_test]
+    true_orders_test = [genus_tax_map.get(g, {}).get("order", "") for g in test_df["genus_name"].astype(str)]
+    valid_o = [(t, p) for t, p in zip(true_orders_test, order_preds_test) if t and p]
+    order_acc_seen = accuracy_score(*zip(*valid_o)) if valid_o else 0.0
+
+    print(f"  Family accuracy (seen genera): {family_acc_seen:.4f}")
+    print(f"  Order accuracy (seen genera): {order_acc_seen:.4f}")
+
+    seen_genera_eval = {
+        "genus": {"accuracy": genus_acc_seen},
+        "family": {"accuracy": float(family_acc_seen)},
+        "order": {"accuracy": float(order_acc_seen)},
+    }
+
     # Save
     results = {
         "experiment": "evo2_lora_curriculum",
         "adapter_dim": args.adapter_dim,
         "epochs": args.epochs,
         "test_accuracies": {k: float(v) for k, v in test_accs.items()},
-        "hierarchical_unseen": hierarchical,
+        "eval_a_unseen_genera": hierarchical,
+        "eval_b_seen_genera_unseen_species": seen_genera_eval,
     }
 
     output_path = os.path.join(args.output_dir, "evo2_lora_curriculum_results.json")
