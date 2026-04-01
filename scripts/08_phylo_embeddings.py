@@ -46,36 +46,86 @@ def tokenize(seq):
     return [CHAR_VOCAB["N"]] * (MAX_SEQ_LEN - len(tokens)) + tokens
 
 
-# ── Taxonomic Distance ───────────────────────────────────────────────────────
+# ── Phylogenetic Distance (Fish Tree of Life + rank-based fallback) ───────────
 
-RANK_LEVELS = {
-    "species": 0,
-    "genus": 1,
-    "family": 2,
-    "order": 3,
-    "class": 4,
-    "phylum": 5,
-}
+TREE_PATH = "data/phylo/actinopt_12k_treePL.tre"
+
+_tree_cache = {"tree": None, "pdm": None, "species_set": None}
 
 
-def compute_taxonomic_distance(tax_a, tax_b):
-    """Compute rank-based taxonomic distance between two species.
+def load_fish_tree():
+    """Load Fish Tree of Life and compute pairwise distance matrix."""
+    if _tree_cache["tree"] is not None:
+        return _tree_cache
 
-    Returns distance 0-5 based on lowest common rank:
-      same species = 0, same genus = 1, same family = 2,
-      same order = 3, same class = 4, different phylum = 5
+    tree_path = Path(TREE_PATH)
+    if not tree_path.exists():
+        print("  Fish Tree of Life not found — using rank-based distances only")
+        return None
+
+    try:
+        import dendropy
+        print(f"  Loading Fish Tree of Life from {tree_path}...")
+        tree = dendropy.Tree.get(path=str(tree_path), schema="newick")
+        pdm = tree.phylogenetic_distance_matrix()
+        species_set = {t.label.replace("_", " "): t for t in tree.taxon_namespace}
+
+        # Find max distance for normalization
+        max_dist = 0
+        sample_taxa = list(tree.taxon_namespace)[:100]
+        for i, t1 in enumerate(sample_taxa):
+            for t2 in sample_taxa[i+1:]:
+                d = pdm(t1, t2)
+                if d > max_dist:
+                    max_dist = d
+
+        _tree_cache["tree"] = tree
+        _tree_cache["pdm"] = pdm
+        _tree_cache["species_set"] = species_set
+        _tree_cache["max_dist"] = max_dist
+        print(f"  Loaded: {len(species_set)} species, max distance ~{max_dist:.1f} MYA")
+        return _tree_cache
+    except ImportError:
+        print("  dendropy not installed — using rank-based distances only")
+        return None
+    except Exception as e:
+        print(f"  Error loading tree: {e} — using rank-based distances only")
+        return None
+
+
+def compute_distance(tax_a, tax_b, tree_cache=None):
+    """Compute phylogenetic distance between two species.
+
+    Uses real tree distances from Fish Tree of Life when both species are
+    in the tree. Falls back to rank-based taxonomic distance otherwise.
+    Returns normalized distance in 0-1 range.
     """
-    if tax_a.get("species") and tax_a["species"] == tax_b.get("species"):
+    sp_a = tax_a.get("species", "")
+    sp_b = tax_b.get("species", "")
+
+    # Try real phylogenetic distance first
+    if tree_cache and tree_cache.get("species_set"):
+        taxon_a = tree_cache["species_set"].get(sp_a)
+        taxon_b = tree_cache["species_set"].get(sp_b)
+        if taxon_a and taxon_b:
+            try:
+                dist = tree_cache["pdm"](taxon_a, taxon_b)
+                return min(dist / tree_cache["max_dist"], 1.0)
+            except Exception:
+                pass
+
+    # Fallback: rank-based distance (normalized to 0-1)
+    if sp_a == sp_b:
         return 0.0
     if tax_a.get("genus") and tax_a["genus"] == tax_b.get("genus"):
-        return 1.0
+        return 0.2
     if tax_a.get("family") and tax_a["family"] == tax_b.get("family"):
-        return 2.0
+        return 0.4
     if tax_a.get("order") and tax_a["order"] == tax_b.get("order"):
-        return 3.0
+        return 0.6
     if tax_a.get("class") and tax_a["class"] == tax_b.get("class"):
-        return 4.0
-    return 5.0
+        return 0.8
+    return 1.0
 
 
 def build_species_taxonomy(df):
@@ -99,9 +149,22 @@ def build_species_taxonomy(df):
 
 def learn_phylo_embeddings(species_list, species_tax, embed_dim=256, n_epochs=200,
                             lr=0.01, n_negatives=32, device="cuda"):
-    """Learn embedding vectors where cosine distance ≈ taxonomic distance."""
+    """Learn embedding vectors where cosine distance ≈ phylogenetic distance.
+
+    Uses real Fish Tree of Life distances for matched fish species,
+    rank-based taxonomic distances for non-fish species.
+    """
     n_species = len(species_list)
     sp_to_idx = {sp: i for i, sp in enumerate(species_list)}
+
+    # Load Fish Tree of Life
+    tree_cache = load_fish_tree()
+    if tree_cache:
+        matched = sum(1 for sp in species_list if sp in tree_cache["species_set"])
+        print(f"  Fish Tree of Life: {matched}/{n_species} species matched ({100*matched/n_species:.1f}%)")
+        print(f"  Using real phylogenetic distances for matched, rank-based for rest")
+    else:
+        print(f"  Using rank-based taxonomic distances for all species")
 
     print(f"  Learning phylogenetic embeddings for {n_species} species (dim={embed_dim})...")
 
@@ -133,9 +196,9 @@ def learn_phylo_embeddings(species_list, species_tax, embed_dim=256, n_epochs=20
             # Cosine distances
             cos_dists = 1 - F.cosine_similarity(anchor_emb.expand_as(other_embs), other_embs)
 
-            # Target taxonomic distances (normalized to 0-1)
+            # Target distances: real phylogenetic (Fish Tree) or rank-based fallback
             target_dists = torch.tensor([
-                compute_taxonomic_distance(anchor_tax, tax_list[idx.item()]) / 5.0
+                compute_distance(anchor_tax, tax_list[idx.item()], tree_cache)
                 for idx in neg_indices
             ], dtype=torch.float32, device=device)
 
