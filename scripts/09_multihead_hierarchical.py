@@ -274,6 +274,8 @@ def main():
 
     if not os.path.exists("BarcodeMamba"):
         os.system("git clone https://github.com/bioscan-ml/BarcodeMamba.git")
+    if "BarcodeMamba" not in sys.path:
+        sys.path.insert(0, "BarcodeMamba")
 
     from utils.barcode_mamba import BarcodeMamba
 
