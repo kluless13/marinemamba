@@ -84,10 +84,12 @@ python3 scripts/12_phylo_fish_only.py --data-dir data/processed --output-dir res
 
 ## Architecture
 
-Built on [BarcodeMamba](https://arxiv.org/abs/2412.11084) (Mamba-2 SSM). Character-level tokenization, 2 layers, d_model=384.
+Built on [BarcodeMamba](https://arxiv.org/abs/2412.11084) (Mamba-2 SSM). 2 layers, d_model=384, character-level tokenization.
 
-- Curriculum model: 4 classification heads (order/family/genus/species) + staged training
-- Phylo model: Projection head mapping to phylogenetic embedding space
+| Model | Params | Training Objective | Best For |
+|-------|--------|-------------------|----------|
+| Curriculum model | ~17M (4.3M backbone + 4 heads) | Order→Family→Genus→Species staged | Classification of novel taxa |
+| Phylo model | ~4.5M (4.3M backbone + projection) | Match Fish Tree of Life distances | Evolutionary placement |
 
 ## Novelty
 
