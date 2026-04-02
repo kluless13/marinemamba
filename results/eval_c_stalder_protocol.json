@@ -1,0 +1,20 @@
+{
+  "experiment": "eval_c_stalder_protocol",
+  "holdout_fraction": 0.2,
+  "min_species_per_genus": 3,
+  "n_reference_sequences": 404875,
+  "n_query_sequences": 111271,
+  "n_holdout_species": 3449,
+  "results": {
+    "species": 0.0,
+    "genus": 0.8503203889602862,
+    "family": 0.9311231138391854,
+    "order": 0.9669545523990977
+  },
+  "stalder_comparison": {
+    "species": 0.007,
+    "genus": 0.507,
+    "family": 0.805,
+    "order": 0.867
+  }
+}

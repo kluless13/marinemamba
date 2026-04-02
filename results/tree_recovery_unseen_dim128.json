@@ -1,0 +1,16 @@
+{
+  "experiment": "tree_recovery_unseen",
+  "embed_dim": 128,
+  "n_unseen_species": 622,
+  "n_train_sample": 500,
+  "unseen_unseen": {
+    "pearson_r": 0.8535003317860156,
+    "spearman_r": 0.7987188256170465,
+    "n_pairs": 30000
+  },
+  "unseen_train": {
+    "pearson_r": 0.9101451507770988,
+    "spearman_r": 0.8455528238827871,
+    "n_pairs": 30000
+  }
+}

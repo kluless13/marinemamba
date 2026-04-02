@@ -1,0 +1,15 @@
+{
+  "model": "evo2_7b_lora",
+  "lora_rank": 64,
+  "dataset": "marine_869K",
+  "species_accuracy": 0.8059995082370297,
+  "best_val_accuracy": 0.7989183874139626,
+  "genus_accuracy_unseen": 0.0,
+  "hierarchical_unseen": {
+    "genus": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_total": 1489
+    }
+  }
+}

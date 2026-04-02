@@ -1,0 +1,17 @@
+{
+  "experiment": "tree_recovery",
+  "n_matched_species": 5888,
+  "n_pairs": 50000,
+  "pearson_r": 0.19486822233895532,
+  "pearson_p": 0.0,
+  "spearman_r": 0.13031765559808287,
+  "spearman_p": 2.975199604002359e-188,
+  "tree_dist_range": [
+    4.05635,
+    385.56557
+  ],
+  "embedding_dist_range": [
+    0.19451475143432617,
+    1.2629629373550415
+  ]
+}

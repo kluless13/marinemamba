@@ -1,0 +1,20 @@
+{
+  "experiment": "phylo_fish_only_real_distances",
+  "n_fish_species": 5888,
+  "n_train_seqs": 140112,
+  "embed_dim": 128,
+  "species_accuracy": 0.9511690512986689,
+  "eval_a_unseen_genera": {
+    "family": 0.39391965255157435,
+    "order": 0.5740137531668477
+  },
+  "eval_c_stalder": {
+    "genus": 0.5717750317588636,
+    "family": 0.8025176117334565,
+    "order": 0.9071101358894407
+  },
+  "tree_recovery": {
+    "pearson_r": 0.9690649614036856,
+    "spearman_r": 0.9143708643071784
+  }
+}

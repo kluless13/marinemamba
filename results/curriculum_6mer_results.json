@@ -1,0 +1,30 @@
+{
+  "experiment": "curriculum_6mer",
+  "tokenization": "6-mer",
+  "vocab_size": 4098,
+  "epochs": 40,
+  "test_accuracies": {
+    "order": 0.9960263373815869,
+    "family": 0.9939106671820223,
+    "genus": 0.9867838422469503,
+    "species": 0.9480372412203077
+  },
+  "eval_a_unseen_genera": {
+    "genus": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_total": 52636
+    },
+    "family": {
+      "accuracy": 0.5391367125161487,
+      "n_correct": 28378,
+      "n_total": 52636
+    },
+    "order": {
+      "accuracy": 0.7693213770043317,
+      "n_correct": 40494,
+      "n_total": 52636
+    }
+  },
+  "eval_b_genus_seen_genera": 0.9856039492510392
+}

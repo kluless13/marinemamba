@@ -1,0 +1,39 @@
+{
+  "experiment": "multihead_hierarchical_curriculum",
+  "epochs": 40,
+  "pretrain_ckpt": "checkpoints/model_e/lightning_logs/version_3/checkpoints/last.ckpt",
+  "test_accuracies": {
+    "order": 0.9958568125258526,
+    "family": 0.9940395060723803,
+    "genus": 0.9869330241199965,
+    "species": 0.9453994344650812
+  },
+  "eval_a_unseen_genera": {
+    "genus": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_total": 52636
+    },
+    "family": {
+      "accuracy": 0.5730678622995669,
+      "n_correct": 30164,
+      "n_total": 52636
+    },
+    "order": {
+      "accuracy": 0.8038034805076374,
+      "n_correct": 41053,
+      "n_total": 52636
+    }
+  },
+  "eval_b_seen_genera_unseen_species": {
+    "genus": {
+      "accuracy": 0.9858277220606085
+    },
+    "family": {
+      "accuracy": 0.993978477124316
+    },
+    "order": {
+      "accuracy": 0.996338263116138
+    }
+  }
+}

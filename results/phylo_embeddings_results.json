@@ -1,0 +1,24 @@
+{
+  "experiment": "phylo_embeddings",
+  "embed_dim": 256,
+  "contrastive": false,
+  "pretrain_ckpt": "checkpoints/model_e/lightning_logs/version_3/checkpoints/last.ckpt",
+  "species_accuracy": 0.9349906083229923,
+  "hierarchical_unseen": {
+    "genus": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_total": 52636
+    },
+    "family": {
+      "accuracy": 0.14927046128125238,
+      "n_correct": 7857,
+      "n_total": 52636
+    },
+    "order": {
+      "accuracy": 0.21496694277680675,
+      "n_correct": 11005,
+      "n_total": 52636
+    }
+  }
+}
