@@ -115,7 +115,6 @@ Built on [BarcodeMamba](https://arxiv.org/abs/2412.11084) (Mamba-2 SSM). 2 layer
 @article{marinemamba2026,
   title={Training Objective Determines Hierarchical Classification and Evolutionary Recovery from Marine DNA Barcodes},
   author={TODO},
-  journal={Methods in Ecology and Evolution},
   year={2026}
 }
 ```
